@@ -1,0 +1,860 @@
+---
+title: "Political Evaluation as Global Affect: Evidence of the Collapse of Trust Dimensionality"
+format: 
+  apaquarto-pdf:
+    documentmode: jou #man
+    keep-tex: true
+    pdf-engine: xelatex
+    include-in-header: preamble.tex
+    geometry: margin=1in
+
+#floatsintext: true
+
+author:
+  - name: Santiago Ventura
+    email: Santiago.ventura@warwick.ac.uk
+    orcid: 0009-0000-4891-6091
+    affiliation: 
+      - id: warwick
+        name: Behavioural Science Group, Warwick Business School, University of Warwick
+        city: Coventry
+        country: United Kingdom
+    corresponding: true
+  - name: Tim Mullett
+    orcid: 0000-0002-4082-2813
+    affiliation:
+      - ref: warwick
+  - name: Nick Chater
+    orcid: 0000-0002-9745-0686
+    affiliation:
+      - ref: warwick
+  - name: Cecilie Steenbuch Traberg
+    orcid: 0000-0002-5640-9273
+    affiliation: 
+      - id: cbs
+        name: Department of Digitalisation, Copenhagen Business School
+        city: Copenhagen
+        country: Denmark
+abstract: |
+  Trust is commonly conceptualised as a multidimensional construct comprising competence, benevolence, and integrity. However, it remains unclear whether individuals meaningfully differentiate these dimensions when evaluating political figures. Drawing on dual-process accounts and research on affective evaluation, we test whether political judgements collapse into a unidimensional construct. Across three preregistered studies in the United States (N = 190), Chile (N = 251), and Denmark (N = 294), participants evaluated real political figures using a validated multidimensional trust scale. Contrary to predictions that dimensionality would vary with levels of political polarisation, principal component analyses consistently revealed a single dominant factor across all contexts, including a low-polarisation setting. Although participants updated their evaluations in response to new information, the underlying structure of trust remained unidimensional. These findings suggest that political judgements are organised around a global affective evaluation, rather than differentiated assessments of competence, benevolence, and integrity. We discuss implications for models of social cognition, political evaluation, and the measurement of trust.
+keywords: ["trust", "polarisation", "dimensionality"]
+bibliography: "My Library.bib"
+
+lang: en
+toc: false
+number-sections: true
+fig-cap-location: bottom
+tbl-cap-location: top
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  fig-width: 7
+  fig-height: 5
+---
+
+```{r setup, include=FALSE}
+library("papaja")
+library("stargazer")
+library("tidyr")
+library("dplyr")
+library("psych")
+library("gridExtra")
+library("readr")
+library("afex")
+library("emmeans")
+library("lme4")
+library("car")
+library("patchwork")
+library("sjPlot")
+library("texreg")
+library("stringr")
+library("ggplot2")
+library("Hmisc")
+library("forcats")
+library("ggsankey")
+r_refs("r-references.bib")
+```
+
+# Introduction
+
+Trust is widely regarded as a foundational element for effective governance and social cohesion. It plays a crucial role in driving compliance and strengthening confidence in regulated sectors [@grimmelikhuijsenValidatingScaleCitizen2017; @mamanMeasuringCitizenTrust2025]. Indeed, high trust in institutions and leaders promotes citizen compliance, cooperation, and the smooth implementation of policies [@jonesConceptualFrameworkInsights2021] and is a key component of social capital that underpins democratic stability [@boixCapitalSocialDemocracia2000; @putnamMakingDemocracyWork1993].
+
+We can understand trust as *"The willingness of a party to be vulnerable to the actions of another party based on the expectation that the other will perform a particular action important to the trustor, irrespective of the ability to monitor or control that other party"* [@mayerIntegrativeModelOrganizational1995, p.712].
+
+However, recent years have seen a decline in political trust amid rising partisan polarisation, eroding the trust that holds democracy together, weakening faith in elected officials and even everyday interpersonal trust [@iyengarOriginsConsequencesAffective2019; @vanprooijenPsychologyPoliticalPolarization2021]. In modern political landscapes, this erosion of trust rarely remains a neutral, performance-based assessment. Instead, as trust in political rivals declines, disagreements often take on an emotional charge, transitioning from policy-based skepticism to active hostility, a phenomenon known as affective animosity. This affective animosity is often theorized to be rooted in partisanship as a core social identity, suggesting that the primary source of polarization is ‘*not ideological but affective, based on identity*’ [@segoviaAffectivePolarizationLowpartisanship2022 ,p.1; @iyengarOriginsConsequencesAffective2019; @huddy2021].
+
+In today's hyper-polarised climate, citizens tend to show greater trust towards figures who share their political identity [@leeSocialTrustPolarized2022], and are more willing to accept information from those. This affective divide decreases people's willingness to cooperate for good causes, raising questions about how trust and partisanship jointly influence democratic decision-making, about how people form trust judgments, and whether those judgments are as deliberate as classical theories assume.
+
+The challenge for researchers lies in understanding how these foundational, often implicit, trust mechanisms evolve or are overridden by more explicit, deliberative judgments in complex social and political environments, particularly under increasing political polarisation. This interplay highlights why understanding the dimensionality of trust under polarisation is not merely an academic exercise but is crucial for addressing real-world challenges in governance and social cohesion.
+
+Despite its acknowledged importance, a significant gap persists in the systematic measurement of trust [@glaeserMeasuringTrust2000]. This persistent difficulty in systematically measuring trust is not merely a methodological problem. It reflects the inherent cognitive complexity of trust itself. If trust judgments are often intuitive and non-deliberative, as suggested by the observation that individuals sometimes do not think deeply about whether they trust someone [@nisbettTellingMoreWe1977; @hirstCognitiveAspectsConsciousness1995], then explicit, rationalized survey measures might fail to capture the underlying mechanisms or the full dimensionality of how trust is actually experienced and acted upon. However, classical models, such as @mayerIntegrativeModelOrganizational1995, propose distinct dimensions of competence, benevolence, and integrity, which are fundamental to understanding trust beyond simple intuition [see @lewicki1998; @mcknight1998; @rousseau1998]. This indicates that the measurement challenge is intrinsically linked to the cognitive processes of trust formation.
+
+## Trust Dimensionality
+
+The three dimensions of trust, perceived competence, perceived benevolence, and perceived integrity, are well-established in the broader organizational trust literature. These dimensions are conceptualized as key elements forming the basis for trusting intentions and behavior.
+
+- Competence (or Ability): This dimension refers to the belief that the trustee possesses the necessary skills, abilities, and expertise to perform effectively within a specific domain.
+
+- Benevolence: This dimension describes the perception that the trustee genuinely cares about the trustor's welfare and intends to act in their best interest, extending beyond mere self-interest.
+
+- Integrity: This dimension represents the belief that the trustee adheres to a set of acceptable principles, is honest, and reliably keeps commitments.
+
+These dimensions were notably validated in the *"Citizen Trust in Government Organizations"* scale [@grimmelikhuijsenValidatingScaleCitizen2017], which resulted in a nine-item measure for these three dimensions. This scale builds upon and adapts established organizational trust research, including works by @mcevilyMeasuringTrustOrganisational2011, @mcknightDevelopingValidatingTrust2002, and @mayerIntegrativeModelOrganizational1995, in public administration. These foundational dimensions have been widely adopted and empirically tested in various fields, including public administration [e.g., @dirks; @colquitt2007; @geyskens1998]. @mamanMeasuringCitizenTrust2025, in turn, systematically applies and reviews the measurement of these dimensions within regulatory agencies, rather than originating the conceptualization of the dimensions themselves. This distinction is crucial for accurately crediting the theoretical lineage and demonstrating a deep understanding of the literature.
+
+While the @mayerIntegrativeModelOrganizational1995 model was originally proposed for interpersonal and business relationships, its applicability to government organizations has been explicitly assessed in other research. It is also recognized that "it cannot be assumed that the conceptualization and measures of citizen trust in other public institutions are suited to the study of trust in regulatory agencies and can be used as a proxy to it" [@mamanMeasuringCitizenTrust2025, p.39]. This implies that while the three dimensions are theoretically robust, their manifestation or relative importance might differ when applied to abstract entities like government agencies or political figures, especially in varying political climates, which underscores the importance of empirical validation in specific contexts [@mamanMeasuringCitizenTrust2025].
+
+## The Role of Cognitive Processing in Trust Judgments and the Impact of Polarisation
+
+Human judgment and decision-making are guided by dual-process theories of cognition, positing two distinct systems of thought. System 1 is fast, automatic, intuitive, and effortless, operating on patterns and past experiences to enable quick judgments [@kahneman2011]. This can manifest as "intuitive faith" in trust contexts [@stoltzDeliberateTrustIntuitive2018]. In contrast, System 2 is slow, deliberate, conscious, rule-based, and effortful, engaged for complex problem-solving and analytical tasks [@kahneman2011], which can be termed "deliberate trust" [@stoltzDeliberateTrustIntuitive2018]. While intuitive faith is often more ubiquitous, deliberate trust is resource-intensive and empirically less common [@stoltzDeliberateTrustIntuitive2018].
+
+Political polarisation, defined as the divergence of political attitudes towards ideological extremes, significantly impacts this cognitive landscape. It encompasses both ideological and affective polarisation, an emotional dislike and distrust of political out-groups, characterized by increasingly positive feelings towards in-group members and negative feelings towards out-group members [@iyengarOriginsConsequencesAffective2019]. Affective polarisation fosters hostility, dehumanization, and an "us vs. them" mindset, eroding trust.
+
+Polarisation significantly impacts individual cognition and social perception, leading to phenomena such as motivated reasoning, where individuals conform assessments of information to desired worldviews, rejecting contradictory evidence [@kahan2013; @kunda1990; @balcetis2006; @dunningNewerLookMotivated1999; @ditto2009; @vanbaar2022], and biased processing, where new information is interpreted in a partisan way even without conscious motivation [@newmanClimateChangeCultural2018; @vanbaar2022]. These characteristics of political polarisation strongly suggest a heightened reliance on System 1 processing.
+
+This suggests that polarisation actively promotes reliance on fast, intuitive judgments and suppresses the effortful, deliberative processes of System 2. If System 2 is suppressed, individuals are less likely to engage in the deliberative evaluation required to differentiate the three dimensions of trust, potentially leading to a simplified, one-dimensional perception. The strong emotional attachment to polarised content and resistance to opposing views reinforces System 1 pervasiveness, making it difficult for System 2 to intervene and differentiate trust dimensions.
+
+Consequently, a well-documented consequence of polarisation is a decline in political trust, particularly across party lines [@ortiz-ospina2016]. Citizens tend to trust government institutions and officials primarily when their preferred party is in power [@leeSocialTrustPolarized2022]. This partisan gap in trust has widened dramatically, with individuals expressing strikingly low trust in a government led by the opposing party [@hetherington2020]. Perceptions of rampant division themselves can further debilitate institutional trust, leading people to become less trusting of political leaders and government generally [@leeSocialTrustPolarized2022]. This extends beyond institutions, as heightened animosity leads individuals to assume the worst about out-group members' motives and credibility, breeding interpersonal distrust [@iyengarOriginsConsequencesAffective2019]. Thus, rising polarisation has weakened the trust that holds democracy together, undermining faith in democratic institutions and weakening governance as people become increasingly unwilling to support compromises or policies advanced by the "other side" [@hetherington2020].
+
+## Polarisation Across International Contexts
+
+Much of the seminal work on polarisation, trust, and policy cueing comes from U.S. studies, but comparative research demonstrates that political polarisation is an escalating global phenomenon affecting both majoritarian and multiparty democracies [@gidron2020; @wagnerAffectivePolarizationMultiparty2021]. Indeed, affective polarisation has become a critical threat to democratic stability worldwide, closely linked to democratic backsliding and increased social conflict [@orhan2022; @østby2008]. Chile, for example, has historically had lower levels of formal party identification, yet it has experienced notable increases in affective polarisation in recent years [@segoviaAffectivePolarizationLowpartisanship2022]. Survey research tracking Chilean public opinion from 1990 to 2021 finds that dislike between the left and right has persisted or even grown, despite many citizens no longer strongly identifying with political parties [@segoviaAffectivePolarizationLowpartisanship2022]. In other words, even in a society where partisan ties have weakened, political factions still exhibit in-group favoritism and out-group animosity. Similar dynamics have emerged in European contexts like the post-Brexit UK, where deep affective divisions formed around referendum identities rather than traditional party affiliations [@hobolt2021]. This suggests that polarisation can manifest through broad ideological or cultural camps, producing effects akin to those in the U.S. two-party system [@edelman2023; @segoviaAffectivePolarizationLowpartisanship2022]. Consequently, the implications for trust and policy acceptance in Chile parallel those observed in the United States [@carlinPoliticalCompetitionPartisanship2018]. Polarised Chilean citizens may be less inclined to trust institutions when control lies with their ideological rivals, echoing patterns of partisan distrust seen in the U.S. [@leeSocialTrustPolarized2022]. These cross-national parallels underscore that the phenomena of political trust decision making are not unique to the U.S. context; they can emerge globally wherever political identities become salient and polarised.
+
+## Present Research
+
+The present studies examine how political polarisation shapes trust dimensionality, focusing on the U.S., Chile, and Denmark. Chile is a highly polarised Latin American context, and Denmark is a country known for its high levels of interpersonal trust and low polarisation, where we expected to find the three dimensions of trust. Drawing on the theories of motivated reasoning and social identity, we investigate partisan bias in evaluations of political figures. Under social identity theory, political polarization simplifies evaluative processes by elevating partisan identification into a primary social identity [@mason2015; @tajfel2001]. Consequently, rather than assessing political figures along multiple independent dimensions of trust [@citrin2018; @poortinga2003], citizens increasingly rely on a binary in-group/out-group heuristic to guide their judgments [@törnberg2022]. Under a polarisation-dependent account, this partisan sorting collapses these distinct evaluative dimensions into a single partisan axis in highly polarized environments [@iyengarOriginsConsequencesAffective2019; @törnberg2022]. However, an alternative possibility is that trust judgments of individual political figures are generally organized around global affective evaluations (halo effects), independent of environmental polarisation. With the following experiments, we aim to clarify how affective polarisation restructures political trust perceptions and deliberation.
+
+While political trust is often conceptualized as multidimensional, encompassing perceptions of competence, integrity, and benevolence [@grimmelikhuijsenValidatingScaleCitizen2017], it remains unclear whether citizens actually rely on these distinctions when evaluating polarised leaders. Our first study tests whether partisan identity simplifies or collapses the dimensional structure of trust, effectively turning trust into a uni-dimensional in-group/out-group evaluation. This addresses a key gap in the trust literature, which has not yet empirically assessed how affective polarisation distorts trust dimensionality. In our first study, we test the dimensionality of trust perceptions when respondents evaluate prominent political figures (e.g., Biden and Trump) across party lines. Our results are consistent with the hypothesis that trust judgments collapse into a unidimensional structure when evaluating individual leaders, though this collapse may be a general feature of leader evaluation rather than an effect exclusive to polarised environments. We also find evidence that partisanship strongly determines trust in politicians.
+
+Despite extensive research on trust and political polarisation, the direct interplay between political polarisation, cognitive processing styles, and the perceived dimensionality of trust remains underexplored. Specifically, there is a gap in understanding how the political environment influences the cognitive architecture of trust judgments.
+
+Our paper outlines two further studies: one in Chile and one in Denmark. Chile provides a wider spectrum of political parties, while still facing intense political conflicts and increasing polarisation in recent years (e.g., during debates over its constitution and inequality, @ChileanSocietyRemains2023). If polarisation is indeed driving one-dimensional trust judgments, we expect to replicate the U.S. results in Chile, observing a similar dimensionality reduction of trust. Finally, we planned a comparative study in Denmark, a country often called "the world's most trusting" society with a consensus-oriented, multi-party political culture [@ortiz-ospina2016]. Denmark has relatively high social trust and lower levels of partisan affective polarisation compared to the U.S. [@williamsDenmarkSecretHow2024]. In this context, we anticipated that citizens would exhibit a more deliberate judgment of trust, aligning with the theoretical three-factor model. In other words, Denmark's respondents should distinguish competence, benevolence, and integrity when evaluating leaders, resulting in a three-dimensional trust structure.
+
+In summary, our research seeks to answer: To what extent is trust truly a three-dimensional construct in practice, and how does this depend on the polarisation of the environment? We address this question through cross-national studies that combine survey experiments and Principal Component Analyses. We design our cross-national comparison to test between two competing accounts of trust dimensionality. On the one hand, a polarisation-dependent account predicts that trust’s dimensionality is shaped by the partisan environment: trust would appear largely unidimensional in highly polarised environments (U.S., Chile) due to partisan sorting, but would remain multidimensional in less polarised environments (Denmark), aligning with the classic three-factor model. On the other hand, a broader global-affect account predicts that political trust evaluations are generally organized around global affective impressions of individual leaders, resulting in a unidimensional structure across all contexts regardless of the level of environmental polarisation. By testing this, our work contributes to both the trust literature and the polarisation literature, examining whether a classic model of trust holds universally or breaks down under partisan bias.
+
+# Study 1: The Structure of Trust in the U.S.
+
+## Methods
+
+All methods were pre-registered in [aspredicted.org #168963](https://aspredicted.org/2h8sa.pdf).
+
+## Participants
+
+```{r s1-load, include=FALSE}
+df1 <- read.csv("study1.csv") 
+df1$match <- ifelse(df1$PoliticalAffiliation == df1$PPI1, TRUE, FALSE)
+df1_filtered <- df1 %>%
+  filter(PPI1 != "Independent") %>%
+  filter(PPI1 != "Other")
+mean_dur_s1 <- mean(df1_filtered$seconds)
+sd_dur_s1 <- sd(df1_filtered$seconds)
+mean_age_s1 <- mean(df1_filtered$age)
+sd_age_s1 <- sd(df1_filtered$age)
+```
+
+We recruited 200 participants from *Prolific* between March 21, 2024 and April 2, 2024. In particular, we aimed for a balanced sample of 100 Republican and 100 Democrat participants from the United States, so we set these as explicit inclusion/recruitment criteria for the sample, based upon participant's self-reported affiliation in their *Prolific* profile. Participants were paid £0.75 for participating in the study which was aimed to last 5 minutes. The mean duration was `r round(mean_dur_s1, 2)` seconds (SD = `r round(sd_dur_s1, 2)`). The sample was composed of 100 female participants, 97 male, and 3 that declared otherwise. Mean age was `r round(mean_age_s1, 2)` (SD = `r round(sd_age_s1, 2)`).
+
+## Materials
+
+**Experimental Stimuli**
+
+Participants were presented with introductory vignettes designed to prime their focus on a specific target politician (Donald Trump or Joe Biden). These paragraphs provided brief biographical details, including party affiliation and term dates.
+
+For the new information phase between trust judgements, a news vignette was used to describe the discovery of classified documents. The text was identical for both conditions, with only the politician’s name modified:
+
+> *"In late 2022 and early 2023, authorities discovered classified documents in \[Politician\]'s former office and personal residence... sparking an investigation into potential unauthorized retention of national defense information."*
+
+**Citizen Trust in Government Scale**
+
+Trust was measured using an adaptation of the scale developed by @grimmelikhuijsenValidatingScaleCitizen2017. The original scale was aimed at measuring trust at the organisational level, by asking participants about their trust on government organisations. It consists of nine items measuring three dimensions, with the difference that we ask for participant's trust in a politician instead of an organisation:
+
+- **Perceived Competence:** (e.g., *"\[Politician\] carries out his duty very well"*)
+
+- **Benevolence:** (e.g., *"\[Politician\] is genuinely interested in the wellbeing of citizens"*)
+
+- **Integrity:** (e.g., *"\[Politician\] approaches citizens in a sincere way"*)
+
+Responses were recorded on a 5-point Likert scale ranging from 1 (*Strongly Disagree*) to 5 (*Strongly Agree*).
+
+**Political Identification and Demographics**
+
+In order to provide a current measure to supplement that shown on their *Prolific* profiles, we assessed Political affiliation through a multi-step branching sequence. Participants first identified their broad affiliation (Democrat, Republican, Independent, Other, or No preference).
+
+- **Partisans** were asked to rate the strength of their affiliation (*Strong* vs. *Not very Strong*).
+
+- **Non-partisans** were asked if they leaned toward either major party, with "Neither" provided as an option.
+
+- **Identity Importance:** A 5-point Likert scale measured how central party identification was to the participant’s self-concept (*Not at all important* to *Extremely important*).
+
+## Procedure
+
+The study was conducted online via the Qualtrics platform. After providing informed consent, participants were randomly assigned to either the **Donald Trump** or **Joe Biden** condition.
+
+The experimental flow proceeded as follows:
+
+1.  **Introduction:** Participants read the introductory paragraph corresponding to their assigned politician.
+
+2.  **Initial Assessment (Pre-test):** Participants completed the adapted Citizen Trust in Government scale regarding the target politician.
+
+3.  **Scandal Vignette:** Participants were presented with the news vignette regarding the classified documents scandal.
+
+4.  **Second Assessment (Post-test):** Participants rated their trust in the politician a second time. During this step, they were shown their previous responses as a reference point to allow for intentional adjustment or consistency.
+
+5.  **Classification:** Participants completed the political affiliation branching questions and the identity importance scale.
+
+6.  **Demographics and Validation:** Participants provided demographic information (age, gender) and completed two attention check items.
+
+Upon completion, all participants were fully debriefed.
+
+## Data Analysis
+
+All participants passed both attention checks, and data cleaning was performed as pre-registered. That is, we excluded the fastest and slowest one percent of the sample, leading to a sample size of 197. We used linear regression to assess whether people's political affiliation predicts baseline perceptions of trust. The average score across all trust items acts as the dependent variable. As the independent variable, we took participants' political affiliation based on self-reports from the survey. For the purposes of these analyses, Democrat affiliation is the reference category. The baseline linear regression model assesses the impact of political affiliation on trust:
+
+\begin{align*}
+\text{Trust}_{1i} = {} & \beta_0 + \beta_1 \cdot \text{Political Affiliation}_i \\
+& + \beta_2 \cdot \text{Politician}_i \\
+& + \beta_3 \cdot \text{Political Affiliation}_i \cdot \text{Politician}_i + \epsilon_i
+\end{align*}
+
+We also used linear regression to evaluate whether the change in perceptions of trust is affected by participants' political affiliation. In this case, the dependent variable is the change in perceived trust, calculated as the difference between the second measurement of trust after being informed about a scandal and the first measurement (before). The regression is as follows:
+
+\begin{align*}
+\Delta \text{Trust}_{i} &= \text{Trust}_{2i} - \text{Trust}_{1i} \\
+&= \beta_0 + \beta_1 \cdot \text{Political Affiliation}_i + \beta_2 \cdot \text{Politician}_i \\
+&\quad + \beta_3 \cdot (\text{Political Affiliation}_i \cdot \text{Politician}_i) + \epsilon_i
+\end{align*}
+
+## Results
+
+### Baseline Levels of Trust
+
+@fig-s1-violin-trust illustrates baseline trust scores across targets (Joe Biden vs. Donald Trump) and participant party identification (Democrats in blue, Republicans in red), measured via the adapted *Citizen Trust in Government Scale* (1–5). The distributions reveal a pronounced partisan congruence effect (in-group favoritism) alongside stark affective polarization (out-group hostility).
+
+```{r}
+#| label: fig-s1-violin-trust
+#| fig-cap: "Trust by Politician and Political Affiliation (Study 1)."
+ggplot(df1_filtered, aes(x = Politician, y = Trust1, fill = PPI1)) +
+  geom_violin(alpha = 0.5, trim = TRUE, position = position_dodge(width = 0.9)) +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    shape = 21,
+    color = "black",
+    size = 3,
+    position = position_dodge(width = 0.9)
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    alpha = 0.5,
+    position = position_dodge(width = 0.9),
+    color = "black"
+  ) +
+  labs(
+    title = "Violin Plot of Trust by Politician and Political Affiliation",
+    x = "Politician", y = "Trust", fill = "Political Affiliation"
+  ) +
+  scale_fill_manual(values = c("Democrat" = "blue", "Republican" = "red")) +
+  theme_classic()
+```
+
+```{r}
+#| label: fig-s1-violin-change
+#| fig.cap: "Trust Change by Politician and Political Affiliation after exposure to a negative news vignette (Study 1)."
+
+ggplot(df1_filtered, aes(x = Politician, y = trust_change, fill = PPI1)) +
+  geom_violin(alpha = 0.5, trim = TRUE, adjust = 2, position = position_dodge(width = 0.9)) +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    color = "black",
+    shape = 21,
+    size = 3,
+    position = position_dodge(width = 0.9)
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    alpha = 0.5,
+    position = position_dodge(width = 0.9),
+    color = "black"
+  ) +
+  labs(
+    title = "Violin Plot of Trust Change by Politician and Political Affiliation",
+    x = "Politician", y = "Trust Change", fill = "Political Affiliation"
+  ) +
+  scale_fill_manual(values = c("Democrat" = "blue", "Republican" = "red")) +
+  theme_classic()
+```
+
+```{r s1-models, results='hide'}
+lm1 <- lm(trust1 ~ dummy_polaff + dummy_pol + dummy_pol*dummy_polaff, data = df1_filtered)
+apa_lm1 <- apa_print(lm1)
+lm2 <- lm(trust_change ~ dummy_polaff + dummy_pol + dummy_pol*dummy_polaff, data = df1_filtered)
+apa_lm2 <- apa_print(lm2)
+```
+
+The linear regression results reveal a strong and statistically significant interaction between participants' political affiliation and the politician they evaluated in predicting baseline trust. The intercept indicates that Democrats evaluating Joe Biden reported relatively high trust (`r apa_lm1$estimate[1]`). Trust was significantly lower when the participant was a Republican (`r apa_lm1$estimate[2]`) or when the evaluated politician was Donald Trump (`r apa_lm1$estimate[3]`). Importantly, the positive interaction term (`r apa_lm1$estimate[4]`) shows that Republicans evaluating Trump also report high levels of trust for their own representative. This suggests that the alignment between a Republican participant and Trump results in a substantial boost in trust perceptions, highlighting a strong partisan congruence effect. Results are reported in *Table 1*.
+
+```{r, results='asis'}
+stargazer(lm1, lm2,
+          type = 'latex',
+          header = FALSE,
+          table.placement = "hbtp",
+          font.size = "scriptsize",
+          no.space = TRUE,
+          dep.var.labels = c("Trust", "Change in Trust"),
+          covariate.labels = c("Repub. (vs Dem)", "Trump (vs Biden)", "Interaction"))
+```
+
+```{r s1-models-part-2, results='hide'}
+# Creating variable identifying those participants whose average trust at time 1 was == 1.
+df1_filtered$trust1_is_1 <- ifelse(df1_filtered$trust1 == 1, 1, 0)
+
+# Running models moderating for said variable.
+#lm1_1mod <- lm(trust_change ~ dummy_pol*dummy_polaff*trust1_is_1, data = df1_filtered) 
+#summary(lm1_1mod)
+#apa_lm1 <- apa_print(lm1)
+
+# Filtering out those participants whose average trust at time 1 was == 1.
+df1_filtered_trust_is_not_1 <- df1_filtered %>%
+  filter(trust1_is_1 == 0)
+
+# Running model only with those who didn't have an average trust at time 1 == 1.
+lm1_no_trust_is_1 <- lm(trust_change ~ dummy_pol*dummy_polaff, data = df1_filtered_trust_is_not_1) 
+summary(lm1_no_trust_is_1)
+apa_lm1_no_1s <- apa_print(lm1_no_trust_is_1)
+```
+
+### Change in Trust after Learning about Bad News
+
+We now apply the same analysis structure as above, but with change in trust as the dependent variable. The intercept is highly significant (`r apa_lm2$estimate[1]`), which shows that on average, trust ratings reduced after exposure to the negative news. Furthermore, there is a non-significant effect for Trump vs. Biden (`r apa_lm2$estimate[3]`), such that when the bad news is about Trump, trust does not drop as much as it does when the bad news is about Biden. There are no significant differences in changes in Trust. Results are reported in *Table 1*. These regression coefficients imply that a Democrat who read about a Biden scandal shifted their Trust by `r round(lm2$coefficients[1], 2)`; a Republican who learned about the Biden scandal shifted by `r round(lm2$coefficients[1] + lm2$coefficients[2], 2)`; a Democrat who read about Trump shifted by `r round(lm2$coefficients[1] + lm2$coefficients[3], 2)`; and a Republican who read about a Trump scandal shifted by `r round(lm2$coefficients[1] + lm2$coefficients[2] + lm2$coefficients[3] + lm2$coefficients[4], 2)`. It is noteworthy that baseline levels of trust in Trump among Democrat participants were already markedly low, suggesting the possibility of a floor effect whereby the subsequent scandal had limited additional impact, as there was little room for trust to decrease. Further, given that we are giving bad news to participants, the change in trust could be upper bounded at zero, which would explain the small effect size and confidence intervals.
+
+To evaluate the robustness of our effects and account for potential floor effects, particularly on those participants who had to evaluate Trump, we conducted a sensitivity analysis by excluding participants who reported the lowest possible baseline trust score $(Trust_1 = 1)$. Within this restricted sub-sample $(N=$ `r nrow(df1_filtered_trust_is_not_1)`$)$, we replicated the change in trust regression. Once again, the intercept is significant (`r apa_lm1_no_1s$estimate[1]`), showing that learning about the scandal decreased trust. However, every other effect became non-significant after excluding those whose first evaluation was already at the lowest point, which suggests that trust declined less for Trump than for Biden because of floor effects for Trump in the initial ratings. This is due to the fact that if people gave Trump the lowest possible value, even after learning about the scandal, the lowest they can give in the second round is the same value, limiting their ability to update their judgements.
+
+```{r}
+#| label: fig-sankey
+#| fig-cap: "Faceted Sankey diagram of Change in Trust by Politician and Political Affiliation (Study 1). Scores rounded to the nearest integer, split by Political Affiliation & Politician"
+
+# Read the dataset
+data_sankey <- df1_filtered
+
+# 1. Round trust1 and trust2 to the nearest integers, and filter out NAs
+data_sankey <- data_sankey %>%
+  mutate(
+    trust1_round = round(trust1),
+    trust2_round = round(trust2)
+  ) %>%
+  filter(!is.na(trust1_round) & !is.na(trust2_round)) %>%
+  # Label the stages for clearer x-axis labels in the plot
+  rename(
+    `Time 1` = trust1_round,
+    `Time 2` = trust2_round
+  )
+
+# 2. Transform the data to long format required by ggsankey
+# Combine PoliticalAffiliation and Politician to preserve both in the long format
+data_sankey_long <- data_sankey %>%
+  mutate(group_var = paste(PPI1, Politician, sep = "_")) %>%
+  make_long(`Time 1`, `Time 2`, value = group_var) %>%
+  mutate(
+    PoliticalAffiliation = sub("_.*", "", value),
+    Politician = sub(".*_", "", value)
+  )
+
+# 3. Create the split Sankey plot
+sankey_plot <- ggplot(data_sankey_long, aes(
+  x = x,
+  next_x = next_x,
+  node = node,
+  next_node = next_node,
+  fill = factor(node),
+  label = node
+)) +
+  # Draw flow links between stages
+  geom_sankey(flow.alpha = 0.6, node.color = "grey30", width = 0.15) +
+  # Add node labels (in the center of the nodes)
+  geom_sankey_label(size = 4, color = "black", fill = "white", fontface = "bold") +
+  # Use a nice color palette
+  scale_fill_brewer(palette = "Set2", name = "Trust Score") +
+  # Apply the specialized ggsankey theme and refine aesthetics
+  theme_sankey(base_size = 14) +
+  # Split the visualization by political affiliation and politician (2x2 grid)
+  facet_grid(PoliticalAffiliation ~ Politician) +
+  labs(
+    x = "Measurement Stage",
+    y = "Number of Responses"
+  ) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, margin = margin(b = 6)),
+    plot.subtitle = element_text(color = "grey40", margin = margin(b = 15)),
+    axis.title.x = element_text(face = "bold", margin = margin(t = 10)),
+    legend.position = "right",
+    legend.title = element_text(face = "bold"),
+    strip.text = element_text(face = "bold", size = 14)  # Style the facet headers (Democrat vs Republican, Biden vs Trump)
+  )
+
+sankey_plot
+```
+
+To further examine the changes in individual-level trust transitions from Time 1 to Time 2 across political groups and target politicians we report a faceted Sankey diagram (see @fig-sankey). The flows reveal two distinct patterns of stability: partisan alignment stability (in-group trust) and partisan polarization rigidity (out-group distrust).
+
+## In-Group Trust Dynamics
+
+For participants evaluating their in-group politician, trust scores clustered at the high end of the scale and remained highly stable over time. Among Democrats evaluating Joe Biden $(N=$ `r nrow(filter(data_sankey, PoliticalAffiliation == "Democrat",Politician == "Biden"))`$)$, mean trust changed minimally from Time 1 $(M=$ `r round(mean(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Biden")$trust1,na.rm = TRUE), 2)`$)$ to Time 2 $(M=$ `r round(mean(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Biden")$trust2,na.rm = TRUE), 2)`, $(\Delta M=$`r round(mean(with(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Biden"),trust2 - trust1),na.rm = TRUE), 2)`$)$. The majority of these participants maintained their exact trust level, with $N=$ `r sum(with(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Biden"),round(trust1) == 4 & round(trust2) == 4),na.rm = TRUE)` remaining at a score of 4 and $N=$ `r sum(with(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Biden"),round(trust1) == 5 & round(trust2) == 5),na.rm = TRUE)` remaining at a score of 5. Similarly, Republicans evaluating Donald Trump $(N=$ `r nrow(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Trump"))`$)$ displayed high, stable trust $(M_\text{Time 1}=$ `r round(mean(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Trump")$trust1,na.rm = TRUE), 2)`$; M_\text{Time 2} =$ `r round(mean(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Trump")$trust2,na.rm = TRUE), 2)`, $\Delta M=$`r round(mean(with(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Trump"),trust2 - trust1),na.rm = TRUE), 2)`$)$. The flows show that $n =$ `r sum(with(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Trump"),round(trust1) == 4 & round(trust2) == 4),na.rm = TRUE)` participants maintained a trust score of 4, and $n =$ `r sum(with(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Trump"),round(trust1) == 5 & round(trust2) == 5),na.rm = TRUE)` maintained a score of 5. Across both in-group cells, downward trust shifts were minor and infrequent.
+
+### Out-Group Distrust and Rigidity
+
+In contrast, trust evaluations for out-group politicians exhibited a severe floor effect characterized by extreme rigidity. Among Democrats evaluating Donald Trump $(N =$ `r nrow(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Trump"))`$)$, mean trust was extremely low and virtually static $(M_\text{Time 1} =$ `r round(mean(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Trump")$trust1,na.rm = TRUE), 2)`$;$ $M_\text{Time 2} =$ `r round(mean(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Trump")$trust2,na.rm = TRUE), 2)`$, \Delta M =$ `r round(mean(with(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Trump"),trust2 - trust1),na.rm = TRUE), 2)`$)$. A total of `r sum(with(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Trump"),round(trust1) == 1 & round(trust2) == 1),na.rm = TRUE)` participants `r round((sum(with(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Trump"),round(trust1) == 1 & round(trust2) == 1),na.rm = TRUE) /nrow(filter(data_sankey,PoliticalAffiliation == "Democrat",Politician == "Trump")))* 100, 1)`$%)$ reported the lowest possible trust score of 1 at both measurement points,showing zero upward movement. We observed a matching pattern of rigid distrust among Republicans evaluating Joe Biden $(N =$ `r nrow(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Biden"))`$; M_\text{Time 1} =$ `r round(mean(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Biden")$trust1,na.rm = TRUE), 2)`$;M_\text{Time 2} =$ `r round(mean(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Biden")$trust2,na.rm = TRUE), 2)`$, \Delta M =$ `r round(mean(with(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Biden"),trust2 - trust1),na.rm = TRUE), 2)`$)$. Here, `r sum(with(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Biden"),round(trust1) == 1 & round(trust2) == 1),na.rm = TRUE)` participants $($`r round((sum(with(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Biden"),round(trust1) == 1 & round(trust2) == 1),na.rm = TRUE) /nrow(filter(data_sankey,PoliticalAffiliation == "Republican",Politician == "Biden")))* 100, 1)`%$)$ remained locked at the lowest trust score of 1 across both times. Taken together, these results demonstrate that while in-group trust is high and stable, out-group distrust is highly entrenched, showing almost complete resistance to positive updates over time.
+
+### Principal Component Analysis
+
+```{r s1-pca, results='hide'}
+df1_subset <- df1_filtered[, c('Q1_1', 'Q1_2', 'Q1_3', 'Q1_4', 'Q1_5', 'Q1_6', 'Q1_7', 'Q1_8', 'Q1_9')]
+pca1dim <- principal(df1_subset, nfactors = 1, rotate = "varimax", scores = TRUE)
+pca1dim
+```
+
+```{r}
+#| results: 'hide'
+#| fig-keep: 'all'
+pa <- fa.parallel(
+  df1_subset,
+  fa = "pc",
+  n.iter = 1000,
+  show.legend = TRUE,
+  main = "Parallel Analysis for PCA"
+)
+pa
+```
+
+```{r}
+obs_ev1 <- pa$pc.values[1]
+sim_ev1 <- pa$pc.sim[1]
+obs_ev2 <- pa$pc.values[2]
+sim_ev2 <- pa$pc.sim[2]
+```
+
+To determine the optimal number of components to retain for the trust survey items, we conducted Horn’s parallel analysis [@horn1965] with 1000 iterations using polychoric correlations to account for the ordinal nature of the data. The analysis compared the observed eigenvalues against the 95th percentile of eigenvalues generated from simulated random data. The parallel analysis supported a clear one-component solution. The eigenvalue of the first component (observed = `r round(obs_ev1,2)`, threshold = `r round(sim_ev1,2)`) exceeded the threshold of the simulated noise, while the second component (observed = `r round(obs_ev2,2)`, threshold = `r round(sim_ev2,2)`) did not. This single dimension accounted for `r round(pca1dim$Vaccounted[2],2)*100`% of the total variance.
+
+In order to better understand how the different dimensions of Trust are represented in perceptions of these two politicians within a highly polarised context, we further conducted a Principal Component Analysis (PCA). This analysis allows us to test whether the Trust measure retains its hypothesized three-component structure across different contexts. The PCA results revealed a clear one-factor solution, suggesting that the items load onto a single underlying construct. Again, the one-dimensional model explained `r round(pca1dim$Vaccounted[2],2)*100`% of the total variance, with a steep drop in the scree plot after the first component (see @fig-s1-scree), indicating a strong dominant factor. While the two-dimensional solution accounted for slightly more variance (92%), the gain was marginal without a clear interpretive advantage. The three-dimensional model increased the explained variance to 94%, but each additional component contributed progressively less.
+
+```{r}
+#| label: fig-s1-scree
+#| fig-cap: "Scree plot of the Principal Component Analysis for Study 1. The red dashed line represents the Kaiser criterion (eigenvalue = 1). The blue labels show the cumulative variance explained by components above the criterion."
+eigenvalues <- pca1dim$values
+scree_data <- data.frame(
+  Component = 1:length(eigenvalues),
+  Eigenvalues = eigenvalues,
+  CumulativeVariance = cumsum(eigenvalues) / sum(eigenvalues)
+)
+
+ggplot(scree_data, aes(x = Component, y = Eigenvalues)) +
+  geom_line() +
+  geom_point() +
+  theme_classic() +
+  labs(title = "Scree Plot of Principal Component Analysis",
+       x = "Principal Component",
+       y = "Eigenvalues") +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  geom_text(aes(label = ifelse(Eigenvalues > 1, round(CumulativeVariance, 2), "")),
+            vjust = -1, size = 3, color = "blue")
+```
+
+This finding suggests that, in a highly polarised U.S. sample, people did not differentiate between competence, benevolence, and integrity when rating a known political figure. Instead, their answers to all items were highly correlated, reflecting a global evaluation: either they broadly trust the politician or they do not. In essence, trust functioned as a unidimensional attitude in this context. Given the nature of the study, in which Democrat and Republican participants evaluated either Joe Biden or Donald Trump, the results are consistent with the pattern of a collapsed, unidimensional trust structure in this context: participants who disliked the opposing party’s leader rated them low on every aspect, whereas those who liked their in-group leader rated them high across the board. This provides initial empirical support for the hypothesis that political trust may operate as a unidimensional construct when evaluating prominent political figures. This finding is consistent with a global-affect or halo-effect interpretation, where overall positive or negative sentiment toward a leader colors all sub-dimensions of trust, rather than reflecting a deliberate differentiation of competence, benevolence, and integrity.
+
+## Discussion
+
+Study 1 established that, in a polarised U.S. context, political affiliation is a strong predictor of trust in politicians. People placed their trust in politicians who shared their political affiliation and discounted trust when they did not. Despite this partisan rigidity, respondents were still responsive to new negative information, trust decreased following exposure to a scandal vignette. Moreover, the PCA suggests that trust can be effectively represented as a unidimensional construct in this context, with a single overarching dimension capturing the majority of the variance. Study 1 established the phenomenon; in the studies that follow, we examine whether it generalises beyond the U.S.
+
+# Study 2: The Structure of Trust in Chile
+
+## Methods
+
+All methods were pre-registered before data collection in [aspredicted.org #257474](https://aspredicted.org/s4b638.pdf).
+
+## Participants
+
+```{r s2-load, include=FALSE}
+d2_raw <- read_csv("study2.csv")
+
+# Remove Qualtrics metadata rows (first row is header, second is question text)
+d2 <- d2_raw %>%
+  mutate(
+    duration = as.numeric(`Duration (in seconds)`),
+    Politician = Politician,
+    izq_der = as_factor(`Políticamente hablando, ¿te identificas más con la Izquierda o la Derecha? - Selected Choice`),
+    c1 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - [Field-Politician] es capaz.`,
+    c2 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - [Field-Politician] es un/a experto/a.`,
+    c3 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - [Field-Politician] cumple muy bien con su deber.`,
+    b1 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - Si los ciudadanos necesitan ayuda, [Field-Politician] hará lo posible para ayudarles.`,
+    b2 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - [Field-Politician] actúa en interés de los ciudadanos.`,
+    b3 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - [Field-Politician] está genuinamente interesado/a en el bienestar de los ciudadanos.`,
+    i1 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - [Field-Politician] tiene un acercamiento sincero con los ciudadanos.`,
+    i2 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - [Field-Politician] es sincero/a.`,
+    i3 = `Cuando se trata de [Field-Politician], ¿hasta qué punto estás de acuerdo o en desacuerdo con las siguientes afirmaciones? - [Field-Politician] es honesto/a.`,
+    age = as.numeric(`¿Qué edad tienes?`),
+    gender = `¿Con qué género te identificas? - Selected Choice`
+  )
+
+d2 <- d2 %>%
+  filter(izq_der != "Otro") %>%
+  filter(izq_der != "Ninguno/Sin preferencia")
+
+# Filter out extreme durations
+d2 <- d2 %>%
+  filter(between(duration,
+                 quantile(duration, 0.01, na.rm = TRUE),
+                 quantile(duration, 0.99, na.rm = TRUE)))
+
+# Recode Likert scale
+recode_likert_es <- function(x) {
+  case_when(
+    x == "Totalmente en desacuerdo" ~ 1,
+    x == "Algo en desacuerdo" ~ 2,
+    x == "Ni de acuerdo ni en desacuerdo" ~ 3,
+    x == "Algo de acuerdo" ~ 4,
+    x == "Totalmente de acuerdo" ~ 5,
+    TRUE ~ NA_real_
+  )
+}
+
+vars_trust <- c("c1", "c2", "c3", "b1", "b2", "b3", "i1", "i2", "i3")
+d2 <- d2 %>%
+  mutate(across(all_of(vars_trust), recode_likert_es))
+
+d2 <- d2 %>%
+  mutate(trust = rowMeans(select(., all_of(vars_trust)), na.rm = TRUE))
+
+n_s2 <- nrow(d2)
+mean_age_s2 <- mean(d2$age, na.rm = TRUE)
+sd_age_s2 <- sd(d2$age, na.rm = TRUE)
+mean_dur_s2 <- mean(d2$duration, na.rm = TRUE)
+sd_dur_s2 <- sd(d2$duration, na.rm = TRUE)
+```
+
+We aimed to recruit 400 participants from a Chilean *Cint* panel between November 12 and 16, 2025, coinciding with the Chilean presidential elections. We recruited participants irrespective of their political affiliation, and then filtered so that we would retain only those who identified as either left-leaning or right-leaning on the final questions of the survey. We did this to prevent participants from responding as they would expect from someone from their political leaning to do so. Also, we decided to dichotomise the political spectrum given that Chile has a spread political parties across that spectrum, but this would allow for a comparable analysis with our previous study. After filtering those who did not identify with either the Left (*Izquierda*) or Right (*Derecha*) and the lowest and highest 1% in survey duration time our sample size was `r nrow(d2)`. The mean duration was `r round(mean_dur_s2, 2)` seconds (SD = `r round(sd_dur_s2, 2)`). Mean age was `r round(mean_age_s2, 2)` (SD = `r round(sd_age_s2, 2)`).
+
+## Materials
+
+**Experimental Stimuli**
+
+Participants were randomly assigned to evaluate one of two prominent figures in the 2025 Chilean presidential election: **José Antonio Kast** (Republican Party, Right) or **Jeannette Jara** (Communist Party, Left). Unlike Study 1, this study focused on baseline trust levels without the introduction of an experimental scandal vignette.
+
+**Localized Citizen Trust Scale**
+
+Trust was measured using the adapted scale from *Study 1* translated to Spanish. The nine-item instrument was modified to fit the Chilean political context while maintaining the three hypothesized dimensions.
+
+## Procedure
+
+The study was implemented via Qualtrics following a cross-sectional design focused on the dimensionality of trust.
+
+The experimental flow was as follows:
+
+1.  **Randomisation:** Participants were assigned to either the **Kast** or **Jara** condition.
+2.  **Trust Assessment:** Participants completed the nine-item localized trust scale regarding their assigned politician. No pre/post manipulation was used; only baseline trust was recorded.
+3.  **Political Identification:** Participants reported their political affiliation and identity strength.
+4.  **Demographics and Validation:** Participants provided demographic data and completed attention checks before being debriefed.
+
+## Data Analysis
+
+Data cleaning followed pre-registered criteria: we excluded the fastest and slowest one percent of the sample based on response duration. We used Principal Component Analysis (PCA) to examine the dimensional structure of trust perceptions in this sample. We also analysed mean trust differences between in-group and out-group conditions to verify the presence of polarisation effects.
+
+## Results
+
+### Violin Plot of Trust
+
+@fig-s2-violin illustrates baseline trust scores across targets (Jeannette Jara vs. José Antonio Kast) and participant party identification (Right in blue, Left in red). The distributions again reveal partisan congruence and out-group hostility, displaying a pattern that closely mirrors the U.S. results in Study 1. When participants evaluate their in-group politician, specifically, Left-leaning (Izquierda, in red) participants rating Jeannette Jara or Right-leaning (Derecha, in blue) participants rating José Antonio Kast, the violin plots are heavily bulbous at the upper end of the scale (4–5), indicating a high concentration of strong trust. Conversely, when rating the out-group politician, Left-leaning participants rating José Antonio Kast or Right-leaning participants rating Jeannette Jara, the distributions are clustered heavily at the lower bound of the scale (1–2), showing floor effects of entrenched distrust. This distinct, bimodal bifurcation across both conditions highlights that political trust in Chile is similarly dominated by a powerful partisan congruence effect (in-group favoritism) and stark out-group hostility (affective polarization), showing that the affective simplification of trust judgments generalizes internationally to other highly polarized contexts.
+
+```{r}
+#| label: fig-s2-violin
+#| fig.cap: "Trust by Politician and Political Orientation in Chile (Study 2)."
+ggplot(d2, aes(x = Politician, y = trust, fill = izq_der)) +
+  geom_violin(alpha = 0.5, position = position_dodge(width = 0.9), trim = TRUE) +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    shape = 21,
+    size = 3,
+    color = "black",
+    position = position_dodge(width = 0.9)
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    alpha = 0.5,
+    position = position_dodge(width = 0.9),
+    color = "black"
+  ) +
+  scale_fill_manual(values = c("Izquierda" = "red", "Derecha" = "blue")) +
+  labs(
+    title = "Trust by Politician and Political Orientation",
+    x = "Politician",
+    y = "Trust (1-5)",
+    fill = "Political Orientation"
+  ) +
+  theme_classic()
+```
+
+```{r s2-models, results='hide'}
+d2$der_dummy <- ifelse(d2$izq_der == "Izquierda", 0, 1)
+d2$kast_dummy <- ifelse(d2$Politician == "Jeannette Jara", 0, 1)
+s2 <- lm(trust ~ der_dummy*kast_dummy, data = d2)
+summary(s2)
+apa_s2 <- apa_print(s2)
+```
+
+The linear regression results are similar to the ones in the previous study. The intercept indicates a relatively high level of trust for Jeannette Jara (`r apa_s2$estimate[1]`). Trust was significantly lower when the participant identified with the Right (`r apa_s2$estimate[2]`) or when the evaluated politician was José Antonio Kast (`r apa_s2$estimate[3]`). Again, the positive interaction term (`r apa_s2$estimate[4]`) shows that participants who identified with the Right when evaluating José Antonio Kast, the candidate that aligned with that affiliation, also report high levels of trust for their own representative. This suggests that the alignment between a Right participant and Kast results in a substantial boost in trust perceptions, highlighting a strong partisan congruence effect. Results are reported in *Table 2*.
+
+```{r, results='asis'}
+stargazer(s2,
+          type = 'latex',
+          header = FALSE,
+          table.placement = "hbtp",
+          font.size = "scriptsize",
+          no.space = TRUE,
+          dep.var.labels = c("Trust"),
+          covariate.labels = c("Right (vs Left)", "Kast (vs Jara)", "Interaction"))
+```
+
+### Principal Component Analysis
+
+```{r s2-pca, results='hide'}
+d2_pca <- d2 %>%
+  select(all_of(vars_trust)) %>%
+  na.omit()
+
+pca_s2 <- principal(d2_pca, nfactors = 1, rotate = "varimax", scores = TRUE)
+pca_s2
+```
+
+```{r s2-scree, fig.cap="Scree plot of the Principal Component Analysis for Study 2 (Chile). The red dashed line represents the Kaiser criterion (eigenvalue = 1). The blue labels show the cumulative variance explained by components above the criterion."}
+eigenvalues_s2 <- pca_s2$values
+scree_data_s2 <- data.frame(
+  Component = 1:length(eigenvalues_s2),
+  Eigenvalues = eigenvalues_s2,
+  CumulativeVariance = cumsum(eigenvalues_s2) / sum(eigenvalues_s2)
+)
+
+ggplot(scree_data_s2, aes(x = Component, y = Eigenvalues)) +
+  geom_line() +
+  geom_point() +
+  theme_classic() +
+  labs(title = "Scree Plot of Principal Component Analysis",
+       x = "Principal Component",
+       y = "Eigenvalues") +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  geom_text(aes(label = ifelse(Eigenvalues > 1, round(CumulativeVariance, 2), "")),
+            vjust = -1, size = 3, color = "blue")
+```
+
+We conducted a Principal Component Analysis (PCA) on the nine-item trust scale to evaluate the dimensionality of trust in the Chilean context. Similar to the findings in the U.S., the analysis yielded a clear one-factor solution. This single component explained `r round(pca_s2[["Vaccounted"]][2], 2)*100`% of the total variance, with an eigenvalue of `r round(pca_s2[["Vaccounted"]][1], 2)`.
+
+Standardized loadings for all items were exceptionally high, ranging from `r round(pca_s2[["loadings"]][2], 2)` to `r round(pca_s2[["loadings"]][4], 2)`, with a mean item complexity of `r round(mean(pca_s2[["complexity"]]), 2)`. The scree plot shows a sharp decline after the first component, which again supports that one dimension is adequate for this construct. Statistical fit was confirmed by a non-significant empirical chi-square $(\chi^2=$ `r round(pca_s2[["chi"]], 2)`$, p=$ `r round(pca_s2[["EPVAL"]], 2)`$)$ and a Root Mean Square of the Residuals (RMSR) of `r round(pca_s2[["rms"]], 2)`.
+
+## Discussion
+
+The replication of a unidimensional trust structure in Chileis consistent with the hypothesis that political trust judgments of individual figures are generally unidimensional, a tendency that may be reinforced or amplified by polarisation. Despite Chile’s different party system and lower formal party identification, the results suggest that evaluations of individual political figures remain unidimensional, mirroring the patterns found in the U.S. These findings suggest that simplified trust judgments are a robust feature of political leader evaluations across different national contexts, rather than being uniquely determined by specific institutional histories or high levels of societal polarization.
+
+# Study 3: The Structure of Trust in Denmark
+
+## Methods
+
+All methods were pre-registered in [aspredicted.org #270,175](https://aspredicted.org/ju4737.pdf).
+
+## Participants
+
+```{r s3-load, include=FALSE}
+d3_raw <- read_csv("study3.csv")
+
+# Remove Qualtrics metadata rows
+d3 <- d3_raw %>% slice(3:n())
+
+d3 <- d3 %>%
+  mutate(
+    duration = as.numeric(`Duration (in seconds)`),
+    block_aff = as_factor(affiliation),
+    politician_check = attention_check,
+    c1 = trust_1,
+    c2 = trust_2,
+    c3 = trust_3,
+    b1 = trust_4,
+    b2 = trust_5,
+    b3 = trust_6,
+    i1 = trust_7,
+    i2 = trust_8,
+    i3 = trust_9,
+    age = as.numeric(age)
+  )
+
+# Filter extreme durations
+d3 <- d3 %>%
+  filter(between(duration,
+                 quantile(duration, 0.01, na.rm = TRUE),
+                 quantile(duration, 0.99, na.rm = TRUE)))
+
+# Filter for only "Rød blok" or "Blå blok"
+d3 <- d3 %>%
+  filter(block_aff %in% c("Rød blok", "Blå blok"))
+
+# Filter attention check
+d3 <- d3 %>%
+  filter(politician_check == Politician)
+
+# Recode Likert scale (Danish)
+recode_likert_dk <- function(x) {
+  case_when(
+    x == "Meget uenig" ~ 1,
+    x == "Delvist Uenig" ~ 2,
+    x == "Hverken enig eller uenig" ~ 3,
+    x == "Delvist enig" ~ 4,
+    x == "Meget enig" ~ 5,
+    TRUE ~ NA_real_
+  )
+}
+
+vars_trust <- c("c1", "c2", "c3", "b1", "b2", "b3", "i1", "i2", "i3")
+d3 <- d3 %>%
+  mutate(across(all_of(vars_trust), recode_likert_dk))
+
+d3 <- d3 %>%
+  mutate(trust = rowMeans(select(., all_of(vars_trust)), na.rm = TRUE))
+
+n_s3 <- nrow(d3)
+mean_age_s3 <- mean(d3$age, na.rm = TRUE)
+sd_age_s3 <- sd(d3$age, na.rm = TRUE)
+mean_dur_s3 <- mean(d3$duration, na.rm = TRUE)
+sd_dur_s3 <- sd(d3$duration, na.rm = TRUE)
+```
+
+We recruited 417 participants from *Cint*, again aiming for a balanced sample between the two blocks, in this case, Rød blok (Red bloc) or Blå blok (Blue bloc). We filtered for participants who identified with either Rød blok (Red bloc) or Blå blok (Blue bloc), with a final sample size of `r n_s3`. The mean duration was `r round(mean_dur_s3, 2)` seconds (SD = `r round(sd_dur_s3, 2)`). Mean age was `r round(mean_age_s3, 2)` (SD = `r round(sd_age_s3, 2)`).
+
+## Materials
+
+**Experimental Stimuli**
+
+Participants were randomly assigned to evaluate one of two prominent figures in Danish politics: **Mette Frederiksen** (Social Democrats, Center-Left) or **Troels Lund Poulsen** (Venstre, Center-Right). Similar to Studies 1 and 2, participants read a brief introductory paragraph providing the politician's party affiliation and current role to standardize the context before assessment.
+
+**Danish Citizen Trust Scale**
+
+Trust was measured using a Danish-translated version of the nine-item scale by @grimmelikhuijsenValidatingScaleCitizen2017. Participants indicated their agreement on a 5-point Likert scale from *Meget uenig* (Strongly Disagree) to *Meget enig* (Strongly Agree).
+
+## Procedure
+
+The study was hosted on the Qualtrics platform. After providing informed consent, participants were randomly assigned to either the **Frederiksen** or **Poulsen** condition.
+
+The experimental procedure followed this sequence:
+
+1.  **Introduction:** Participants were presented with the introductory biographical paragraph for their assigned politician.
+2.  **Trust Assessment:** Immediately following the Introduction, participants completed the nine-item Danish trust scale.
+3.  **Classification:** Participants completed the political affiliation branching questions and the identity importance scale.
+4.  **Demographics and Validation:** Participants provided demographic information (age, gender) and completed two attention check items.
+
+Upon completion, all participants were fully debriefed.
+
+## Data Analysis
+
+Data cleaning followed the same criteria as Studies 1 and 2: we excluded the fastest and slowest one percent of the sample based on response duration and retained only participants who passed the attention check consisting of recalling what politician they were being asked to think of. We conducted a Principal Component Analysis (PCA) to test the dimensional structure of trust perceptions in the Danish sample.
+
+## Results
+
+### Violin Plot of Trust
+
+```{r s3-violin, fig.cap="Trust by Politician and Political Bloc in Denmark (Study 3)."}
+ggplot(d3, aes(x = Politician, y = trust, fill = block_aff)) +
+  geom_violin(alpha = 0.5, position = position_dodge(width = 0.9), trim = TRUE) +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    shape = 21,
+    size = 3,
+    color = "black",
+    position = position_dodge(width = 0.9)
+  ) +
+  geom_boxplot(
+    width = 0.2,
+    outlier.shape = NA,
+    alpha = 0.5,
+    position = position_dodge(width = 0.9),
+    color = "black"
+  ) +
+  scale_fill_manual(values = c("Rød blok" = "red", "Blå blok" = "blue")) +
+  labs(
+    title = "Trust by Politician and Political Affiliation",
+    x = "Politician",
+    y = "Trust (1-5)",
+    fill = "Political Affiliation"
+  ) +
+  theme_classic()
+```
+
+### Principal Component Analysis
+
+```{r s3-pca, results='hide'}
+d3_pca <- d3 %>%
+  select(all_of(vars_trust)) %>%
+  na.omit()
+
+pca_s3 <- principal(d3_pca, nfactors = 1, rotate = "varimax", scores = TRUE)
+pca_s3
+```
+
+```{r s3-scree, fig.cap="Scree plot of the Principal Component Analysis for Study 3 (Denmark). The red dashed line represents the Kaiser criterion (eigenvalue = 1). The blue labels show the cumulative variance explained by components above the criterion."}
+eigenvalues_s3 <- pca_s3$values
+scree_data_s3 <- data.frame(
+  Component = 1:length(eigenvalues_s3),
+  Eigenvalues = eigenvalues_s3,
+  CumulativeVariance = cumsum(eigenvalues_s3) / sum(eigenvalues_s3)
+)
+
+ggplot(scree_data_s3, aes(x = Component, y = Eigenvalues)) +
+  geom_line() +
+  geom_point() +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  labs(title = "Scree Plot of Principal Component Analysis",
+       x = "Principal Component",
+       y = "Eigenvalues") +
+  theme_classic() +
+  geom_text(aes(label = ifelse(Eigenvalues > 1, round(CumulativeVariance, 2), "")),
+            vjust = -1, size = 3, color = "blue")
+```
+
+The PCA conducted on the Danish sample produced an unexpected unidimensional result, contrary to the initial hypothesis of a three-dimensional structure. The single factor explained 78% of the total variance, with a dominant eigenvalue of 7.01.
+
+Loadings for competence, benevolence, and integrity items remained high (.83 to .90), and the mean item complexity was 1.0. The model fit was statistically adequate ($\chi^2=25.08$, $p<.57$; RMSR = 0.03).
+
+## Discussion
+
+The emergence of a single factor in Denmark,a low-polarisation environment,suggests that the collapse of trust dimensionality may be more fundamental to political judgment than previously theorised. While polarisation certainly exacerbates this effect in the U.S. and Chile, the Danish results indicate that even in high-trust, consensus-oriented cultures, citizens evaluate specific political leaders through a global lens rather than differentiating between competence and character. This implies that trust in individual politicians may naturally function as a visceral, System 1 heuristic, regardless of the broader political climate.
+
+# General Discussion
+
+Across three countries,the United States, Chile, and Denmark,we consistently found that trust in politicians functions as a unidimensional construct. This consistency represents the central and unexpected finding of this research programme.
+
+## The Pervasiveness of Unidimensional Trust
+
+The most striking result is the uniformity of the one-factor solution across contexts that differ substantially in political culture, party system, and polarisation levels. Our original hypothesis anticipated that polarisation would be the key driver of trust dimensionality reduction,that highly polarised settings (U.S. and Chile) would produce collapsed, heuristic-driven trust judgments, while the low-polarisation, high-trust environment of Denmark would permit more deliberate, multidimensional assessments. The Danish data flatly contradicted this prediction. This empirical contradiction forces a theoretical shift: rather than being a specific product of polarisation, the collapse of trust dimensionality appears to be a baseline feature of individual political leader evaluation. It suggests that evaluations of political figures generally operate through global affective impressions (halo effects) that override analytical differentiation, regardless of the level of environmental polarisation.
+
+One possible alternative interpretation is that the politicians evaluated in Denmark are perceived as comparably competent, benevolent, and honest by those who support them vs. do not support them, such that the scale fails to produce variance along separate dimensions. Although this cannot be ruled out, we believe the cross-country consistency of results points to something more fundamental. This points to a major methodological and measurement implication of our work: multidimensional trust scales validated for abstract institutions do not function similarly when applied to salient political individuals. The @grimmelikhuijsenValidatingScaleCitizen2017 scale was validated for government organizations, where citizens can make detached, analytical judgments, distinguishing competence from integrity. However, individual politicians are salient social and personal figures. Evaluating them triggers a global affective response (halo effect) that collapses these categories. Researchers cannot assume trust scales are target-neutral; a scale measuring three distinct factors for an institution measures only a single global factor when applied to an individual.
+
+## Theoretical Implications
+
+These results challenge the universal applicability of multidimensional trust models [e.g., @grimmelikhuijsenValidatingScaleCitizen2017; @mayerIntegrativeModelOrganizational1995] when applied to prominent political figures. While citizens may be capable of distinguishing trust dimensions when evaluating abstract institutions, they appear to collapse them when evaluating named individuals. This is consistent with a Halo Effect interpretation [@thorndike1920]: a general positive or negative sentiment toward a politician dictates responses across all sub-dimensions of trust. From a dual-process perspective, our findings suggest that even when System 2 engagement is theoretically more likely,as in a low-polarisation, high-trust society,the act of judging a familiar political figure may reliably recruit System 1 heuristics. The salience of individual politicians as social and partisan objects may be sufficient to short-circuit deliberate, dimensional evaluation.
+
+These results also carry practical implications. If citizens consistently collapse trust into a single dimension, then policy efforts aimed at building trust through "demonstrated competence" alone are unlikely to be effective if a baseline affective deficit exists toward a leader. Communication strategies must first address the global affective orientation of the public toward a political figure before specific attributes such as integrity or expertise can register as distinct positive signals.
+
+## Limitations and Future Directions
+
+Several limitations should be noted. First, the studies relied on relatively short, single-session survey designs. Longitudinal approaches might reveal whether prolonged exposure to political figures or shifting political contexts can restore dimensionality in trust judgments. Second, the reliance on the @grimmelikhuijsenValidatingScaleCitizen2017 scale, while enabling direct comparisons across studies, may limit our ability to detect multidimensionality if the instrument itself is not sensitive enough when applied to individual political figures. Future research should explore alternative measurement strategies,including implicit measures or process-tracing methods,to better capture the latent structure of political trust. Third, the selection of specific politicians in each country may have influenced results; replication with different target figures would strengthen the generalisability of these findings.
+
+Future research should also examine the causal mechanisms linking political context to trust structure, consider whether the unidimensionality of trust varies by political involvement or cognitive style, and explore whether interventions designed to promote deliberate evaluation can restore dimensional differentiation even in polarised contexts.
+
+## Conclusion
+
+Our research demonstrates that political trust in individual leaders is effectively a unidimensional attitude across contemporary democratic contexts. While we initially expected polarisation to drive this collapse, the Danish findings show that unidimensionality is a baseline feature of how citizens process information about individual political leaders, which is simply reinforced by affective animosity in highly polarised contexts like the U.S. and Chile. Understanding this structural simplicity is a prerequisite for designing communication strategies and trust-building initiatives that can resonate across the ideological divides of modern democratic societies.
+
+# References
+
+::: {#refs custom-style="Bibliography"}
+:::
